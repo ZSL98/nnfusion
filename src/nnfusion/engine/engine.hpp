@@ -88,6 +88,7 @@ namespace nnfusion
 
             for (auto& pass : *this)
             {
+                printf("pass one\n");
                 status = pass->run_on_graph(graph);
                 if (!status)
                     break;

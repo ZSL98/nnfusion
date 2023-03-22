@@ -17,6 +17,7 @@ using namespace nnfusion::kernels::cuda;
 
 bool CudaDefaultRuntime::codegen(const ProfilingContext::Pointer& ke)
 {
+    printf("CudaDefaultRuntime::codegen\n");
     if (ke->source_code != nullptr)
         return true;
 
@@ -489,7 +490,7 @@ bool CudaDefaultRuntime::compile(const ProfilingContext::Pointer& ke)
 
     int ret = system(("nvcc\t-lcudnn\t-lcublas\t--compiler-options\t'-fPIC\t "
                       "--shared'\t--cudart\tshared\t-O2\t-gencode="
-                      "arch=compute_60,code=compute_60\t-gencode=arch=compute_61,code=compute_61\t-"
+                      "arch=compute_80,code=compute_80\t-gencode=arch=compute_61,code=compute_61\t-"
                       "std=c++11\t--expt-relaxed-constexpr\t" +
                       srcname + "\t-o\t" + objname)
                          .c_str());
@@ -1028,7 +1029,7 @@ bool CUPTIRuntime::compile(const ProfilingContext::Pointer& ke)
         system(("nvcc\t-lcudnn\t-lcublas\t-lcupti\t--compiler-options\t'-fPIC\t "
                 "-I/usr/local/cuda/extras/CUPTI/include\t-L/usr/local/cuda/extras/CUPTI/lib64\t"
                 "--shared'\t--cudart\tshared\t-O2\t-gencode="
-                "arch=compute_60,code=compute_60\t-gencode=arch=compute_61,code=compute_61\t"
+                "arch=compute_80,code=compute_80\t-gencode=arch=compute_61,code=compute_61\t"
                 "-gencode=arch=compute_70,code=compute_70\t-gencode=arch=compute_75,code=compute_"
                 "75\t-std=c++11\t--expt-relaxed-constexpr\t" +
                 srcname + "\t-o\t" + objname)

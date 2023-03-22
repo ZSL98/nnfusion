@@ -37,6 +37,12 @@ using namespace nnfusion::pass::graph::autodiff;
 
 bool AutodiffPass::run_on_graph(std::shared_ptr<Graph>& graph)
 {
+    bool enable_autodiff = FLAGS_fautodiff;
+    if (!enable_autodiff)
+    {
+        return true;
+    }
+
     run_on_graph(graph, nullptr);
 }
 

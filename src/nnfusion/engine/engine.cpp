@@ -30,14 +30,18 @@ bool Engine::run_on_graph(graph::Graph::Pointer graph, EngineContext::Pointer co
     if (context == nullptr)
         context = make_shared<EngineContext>();
 
+    printf("What is going on...\n");
     NNFUSION_LOG(INFO) << "Graph Passes count:" << (g_passes != nullptr ? g_passes->size() : 0);
     NNFUSION_LOG(INFO) << "Interpreter Passes count:"
                        << (m_passes != nullptr ? m_passes->size() : 0);
 
     bool result = true;
     if (g_passes != nullptr)
+    {
         result = g_passes->run_on_graph(graph, context);
+    }
 
+    printf("What is going on...02\n");
     NNFUSION_CHECK(result) << "Engine failed after finished graph passes.";
 
     ir::Program::Pointer p = nullptr;
