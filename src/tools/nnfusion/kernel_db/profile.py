@@ -172,11 +172,13 @@ def log_sync(kernel, path):
 
 
 def profile(kernel, path):
-    command = ["make; nvprof --normalized-time-unit us --csv ./profile"]
+    command = ["make; /opt/nvidia/nsight-compute/2022.2.1/ncu --metrics gpu__time_duration.sum --csv ./profile"]
     process = subprocess.Popen(
         command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=path, shell=True)
     device_info, nvprof = process.communicate()
+    # print(device_info)
     device_name = re.compile(r'Profiling on Device \d+: "(.*)"')
-    kernel_profile = re.compile(
-        r'"GPU activities",.+,.+,\d+,(.+),.+,.+,"{}"'.format(kernel))
-    return device_name.search(str(device_info)).group(1) + ":" + kernel_profile.search(str(nvprof)).group(1) + ";"
+    device_name.search(str(device_info)).group(1)
+    match = re.findall(r'"gpu__time_duration.sum","nsecond","(\d+)"', str(device_info))[0]
+    return "NVIDIA A100-PCIE-40GB" + ":" + str(float(match)/1000) + ";"
+

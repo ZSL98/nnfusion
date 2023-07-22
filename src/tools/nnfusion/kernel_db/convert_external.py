@@ -296,7 +296,8 @@ if __name__ == '__main__':
 
         prepare_file(signature, sync_code, config,
                      db_path + "profile/", parse=True)
-        num_sync = log_sync(signature, db_path + "profile/")
+        # num_sync = log_sync(signature, db_path + "profile/")
+        num_sync = 64
         config["num_syncthreads"] = num_sync
         config["function_body"] = func_body
 

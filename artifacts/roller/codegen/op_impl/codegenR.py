@@ -32,11 +32,13 @@ class CodeGeneratorR:
         for axis_name in rprog.saxis:
             self.tiling[axis_name] = []
             axis_cfg = rprog.GetAxisConfig(axis_name)
+            print(axis_cfg)
             for i in range(rprog.num_level):
                 self.tiling[axis_name].append(math.ceil(axis_cfg[i] / axis_cfg[i + 1]))
         for axis_name in rprog.raxis:
             self.tiling[axis_name] = []
             axis_cfg = rprog.GetAxisConfig(axis_name)
+            print(axis_cfg)
             for i in range(rprog.num_level):
                 self.tiling[axis_name].append(math.ceil(axis_cfg[i] / axis_cfg[i + 1]))
         return self.tiling

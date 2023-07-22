@@ -18,7 +18,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--op', type=str, default='matmul_expr')
 parser.add_argument('--shape', nargs='*', type=int, default=[65536, 1024, 30522])
 parser.add_argument('--rtile2_shape', nargs='*', type=int, default=[1, 1, 1])
-parser.add_argument('--rtile1_shape', nargs='*', type=int, default=[8, 8, 1])
+parser.add_argument('--rtile1_shape', nargs='*', type=int, default=[16, 8, 1])
 parser.add_argument('--rtile0_shape', nargs='*', type=int, default=[128, 64, 8])
 parser.add_argument('--arch', type=str, default='V100')
 parser.add_argument('--backend', type=str, default='tvm')
@@ -174,6 +174,8 @@ def get_tvm_source(rprog, arch, policy, dtype):
         pad = get_pad(rprog, out_tensor)
         print("pad: ", pad)
         expr_out = expr(shape, dtype, False, pad)
+        print('----- ')
+        print(expr_out)
         in_tensors, out_tensors = expr_out[0], expr_out[1]
         ori_in = []
         pad_in = []
@@ -184,11 +186,14 @@ def get_tvm_source(rprog, arch, policy, dtype):
                 ori_in.append(ins)
         out_tensor = out_tensors[0]
         write_tensor = out_tensors[-1]
+        print(write_tensor.op)
         s = te.create_schedule(write_tensor.op)
         align_info = policy.get_align_info_fuse(rprog, arch, args.smem_tiling, args.reg_tiling, target_stage=out_tensor.name, write_stage=write_tensor.name, st_align=args.st_align)
         cgen = CodeGeneratorR()
         cgen.rewrite_schedule_fuse(s, rprog, args.smem_tiling, args.reg_tiling, pad_in, out_tensors[:-1], write_tensor, target_stage=out_tensor.name, write_stage=write_tensor.name, align_info=align_info, bank_size=arch.smem_bank_size)
-        func = tvm.build(s, ori_in + out_tensors, "cuda")  
+        func = tvm.build(s, ori_in + out_tensors, "cuda")
+        print('------')
+        # print(tvm.lower(s, ori_in + out_tensors, simple_mode=True))
     else:
         s = te.create_schedule(out_tensor.op)
         align_info = policy.get_align_info(rprog, arch, args.smem_tiling, args.reg_tiling, target_stage=out_tensor.name, st_align=args.st_align)
@@ -260,6 +265,9 @@ if __name__ == '__main__':
         if not args.use_tc:
             source = get_tvm_source(rprog, arch, policy, dtype)
             main_source = main_template(args.backend, source, op, grids, blocks, times)
+            print(rprog.GetTile(0).Dump())
+            print(rprog.GetTile(1).Dump())
+            print(rprog.GetTile(2).Dump())
         else:
             source = get_tc_mm_source(
                 op.GetInputTensors()[0],
